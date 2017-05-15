@@ -1,9 +1,9 @@
 import sqlalchemy as db
-from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 import datetime
 
-Base = automap_base()
+Base = declarative_base()
 
 
 class TableInfo(Base):
