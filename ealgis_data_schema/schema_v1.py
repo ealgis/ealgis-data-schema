@@ -146,77 +146,6 @@ class GeometryLinkage(object):
     attr_column = db.Column(db.String(256))
 
 
-class GeometryIntersection(object):
-    "intersection of two priority geometries, indexed by gids from their source columns"
-    __tablename__ = 'geometry_intersection'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    gid = db.Column(db.Integer, index=True, nullable=False)
-    with_gid = db.Column(db.Integer, index=True, nullable=False)
-    percentage_overlap = db.Column(db.Float, nullable=False)
-    area_overlap = db.Column(db.Float, nullable=False)
-
-    @declared_attr
-    def geometry_relation_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('geometry_relation.id'), index=True, nullable=False)
-
-    def __repr__(self):
-        return "<%d,%d>: %.2f%%" % (
-            self.gid,
-            self.with_gid,
-            self.percentage_overlap)
-
-
-class GeometryTouches(object):
-    "geometries that touch but do not overlap"
-    __tablename__ = 'geometry_touches'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    gid = db.Column(db.Integer, index=True, nullable=False)
-    with_gid = db.Column(db.Integer, index=True, nullable=False)
-
-    @declared_attr
-    def geometry_relation_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('geometry_relation.id'), index=True, nullable=False)
-
-    def __repr__(self):
-        return "<%d,%d>" % (
-            self.gid,
-            self.with_gid)
-
-
-class GeometryRelation(object):
-    "relationship of geometries; eg. one row in a geometry table with another row in another table (possibly the same table)"
-    __tablename__ = 'geometry_relation'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-
-    @declared_attr
-    def geo_source_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('geometry_source.id'), nullable=False)
-
-    @declared_attr
-    def overlaps_with_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('geometry_source.id'), nullable=False)
-
-    @declared_attr
-    def intersections(cls):
-        return relationship(
-            'GeometryIntersection',
-            cascade="all",
-            backref=backref('relation'),
-            lazy='dynamic')
-
-    @declared_attr
-    def touches(cls):
-        return relationship(
-            'GeometryTouches',
-            cascade="all",
-            backref=backref('relation'),
-            lazy='dynamic')
-
-    __table_args__ = (db.UniqueConstraint('geo_source_id', 'overlaps_with_id'),)
-    # FIXME: add the index
-    # db.Index('georelation_lookup', geo_source_id, overlaps_with_id))
-
-
 class EALGISMetadata(object):
     "metadata table for a given set of datasets in a schema"
     __tablename__ = 'ealgis_metadata'
@@ -234,13 +163,10 @@ class SchemaStore:
     _schema_classes = [
         EALGISMetadata,
         TableInfo,
-        # ColumnInfo,
-        # GeometrySourceProjected,
-        # GeometrySource,
-        # GeometryLinkage,
-        # GeometryIntersection,
-        # GeometryTouches,
-        # GeometryRelation,
+        ColumnInfo,
+        GeometrySourceProjected,
+        GeometrySource,
+        GeometryLinkage,
     ]
 
     def __init__(self):
