@@ -1,6 +1,9 @@
 import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.schema import Table, Column, MetaData, ForeignKey
+from sqlalchemy.types import JSON, Integer, String
+from collections import defaultdict
 import datetime
 
 
@@ -170,21 +173,33 @@ class SchemaStore:
     ]
 
     def __init__(self):
-        self.bases = {}
-        self.classes = {}
+        self.metadata = defaultdict(MetaData)
+        self.tables = defaultdict(list)
 
     def _import_schema(self, schema_name):
-        Base = self.bases[schema_name] = declarative_base()
-        self.classes[schema_name] = classes = {}
-        for cls in self._schema_classes:
-            print("register class:", cls)
-            classes[cls.__name__] = type(schema_name.replace('_', '').upper() + cls.__name__, (cls, Base), {'__table_args__': {'schema': schema_name}})
+        def fkey(target):
+            return ForeignKey(schema_name + '.' + target)
+
+        metadata = self.metadata[schema_name]
+        tables = self.tables[schema_name]
+        tables.append(Table(
+            "table_info", metadata,
+            Column('id', Integer, primary_key=True),
+            Column('name', String(256)),
+            Column('metadata', JSON()),
+            schema=schema_name))
+        tables.append(Table(
+            "column_info", metadata,
+            Column('id', Integer, primary_key=True),
+            Column('table_info_id', Integer, fkey('table_info.id'), nullable=False),
+            Column('name', String(256)),
+            Column('metadata', JSON()),
+            schema=schema_name))
 
     def load_schema(self, schema_name):
-        if schema_name not in self.classes:
+        if schema_name not in self.metadata:
             self._import_schema(schema_name)
-        print(self.classes, self.bases)
-        return self.bases[schema_name], self.classes[schema_name]
+        return self.metadata[schema_name], self.tables[schema_name]
 
 
 store = SchemaStore()
