@@ -10,6 +10,7 @@ from sqlalchemy.types import (
     Integer,
     String)
 from collections import defaultdict
+from uuid import uuid4
 import datetime
 
 
@@ -22,15 +23,24 @@ class SchemaStore:
         def fkey(target):
             return ForeignKey(schema_name + '.' + target)
 
+        def make_uuid():
+            return str(uuid4())
+
         metadata = self.metadata[schema_name]
         tables = self.tables[schema_name]
         tables.append(Table(
             "ealgis_metadata", metadata,
             Column('id', Integer, primary_key=True),
-            Column('name', String(256)),
-            Column('version', String(256)),
-            Column('description', Text()),
-            Column('date_created', DateTime(timezone=True), default=datetime.datetime.utcnow),
+            Column('name', String(256), nullable=False),
+            Column('uuid', String(36), nullable=False, default=make_uuid),
+            Column('description', Text(), nullable=False),
+            Column('date_created', DateTime(timezone=True), default=datetime.datetime.utcnow, nullable=False),
+            schema=schema_name))
+        tables.append(Table(
+            "dependencies", metadata,
+            Column('id', Integer, primary_key=True),
+            Column('name', String(256), nullable=False),
+            Column('uuid', String(36), nullable=False),
             schema=schema_name))
         tables.append(Table(
             "table_info", metadata,
