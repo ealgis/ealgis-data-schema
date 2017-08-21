@@ -52,7 +52,7 @@ class SchemaStore:
             "column_info", metadata,
             Column('id', Integer, primary_key=True),
             Column('table_info_id', Integer, fkey('table_info.id'), nullable=False),
-            Column('name', String(256)),
+            Column('schema_name', String(256)),
             Column('metadata', JSON()),
             schema=schema_name))
         tables.append(Table(
@@ -72,9 +72,11 @@ class SchemaStore:
         tables.append(Table(
             "geometry_linkage", metadata,
             Column('id', Integer, primary_key=True),
-            Column('table_info_id', Integer, fkey('table_info.id'), nullable=False),
-            Column('geometry_source_id', Integer, fkey('geometry_source.id'), nullable=False),
-            Column('geo_column', String(256)),
+            # in the source schema: may not be the same schema as this Table instance
+            Column('geometry_source_schema_name', String, nullable=False),
+            Column('geometry_source_column_id', Integer, nullable=False),
+            # these must be in this schema
+            Column('attr_table_id', Integer, fkey('table_info.id'), nullable=False),
             Column('attr_column', String(256)),
             schema=schema_name))
         tables.append(Table(
