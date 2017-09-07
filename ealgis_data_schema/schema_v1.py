@@ -53,6 +53,7 @@ class SchemaStore:
             "column_info", metadata,
             Column('id', Integer, primary_key=True),
             Column('table_info_id', Integer, fkey('table_info.id'), nullable=False),
+            Column('name', String(256)),
             Column('schema_name', String(256)),
             Column('metadata', JSON()),
             schema=schema_name))
