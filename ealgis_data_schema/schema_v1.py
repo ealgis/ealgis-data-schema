@@ -32,6 +32,7 @@ class SchemaStore:
             "ealgis_metadata", metadata,
             Column('id', Integer, primary_key=True),
             Column('name', String(256), nullable=False),
+            Column('family', String(256), nullable=True),
             Column('uuid', String(36), nullable=False, default=make_uuid),
             Column('description', Text(), nullable=False),
             Column('date_created', DateTime(timezone=True), default=datetime.datetime.utcnow, nullable=False),
