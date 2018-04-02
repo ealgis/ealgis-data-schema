@@ -60,23 +60,24 @@ class SchemaStore:
         tables.append(Table(
             "geometry_source", metadata,
             Column('id', Integer, primary_key=True),
-            Column('gid', String(256)),
             Column('table_info_id', Integer, fkey('table_info.id'), nullable=False),
+            Column('gid_column', String(256)),
             Column('geometry_type', String(256)),
             schema=schema_name))
         tables.append(Table(
-            "geometry_source_column", metadata,
+            "geometry_source_projection", metadata,
             Column('id', Integer, primary_key=True),
-            Column('geometry_source_id', Integer, fkey('geometry_source.id'), nullable=False),
-            Column('column', String(256)),
+            Column('geometry_source_id', Integer, fkey('table_info.id'), nullable=False),
+            Column('geometry_column', String(256)),
             Column('srid', Integer),
             schema=schema_name))
+
         tables.append(Table(
             "geometry_linkage", metadata,
             Column('id', Integer, primary_key=True),
             # in the source schema: may not be the same schema as this Table instance
             Column('geometry_source_schema_name', String, nullable=False),
-            Column('geometry_source_column_id', Integer, nullable=False),
+            Column('geometry_source_id', Integer, nullable=False),
             # these must be in this schema
             Column('attr_table_id', Integer, fkey('table_info.id'), nullable=False),
             Column('attr_column', String(256)),
