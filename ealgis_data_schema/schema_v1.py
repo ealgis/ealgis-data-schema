@@ -36,6 +36,7 @@ class SchemaStore:
             Column('uuid', String(36), nullable=False, default=make_uuid),
             Column('description', Text(), nullable=False),
             Column('date_created', DateTime(timezone=True), default=datetime.datetime.utcnow, nullable=False),
+            Column('date_published', DateTime(timezone=True), nullable=False),
             schema=schema_name))
         tables.append(Table(
             "dependencies", metadata,

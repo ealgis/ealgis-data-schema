@@ -11,7 +11,7 @@ setup(
     keywords="ealgis",
     url="https://github.com/ealgis/ealgis-data-schema",
     name="ealgis_data_schema",
-    version="1.1.0",
+    version="1.1.1",
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=install_requires,
 )
